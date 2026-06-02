@@ -1,0 +1,24 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Streamlit secrets (never commit)
+.streamlit/secrets.toml
+.env
+
+# Wine Reviews CSV is 50 MB — downloaded at runtime by reviews_loader.py
+data/raw/winemag-reviews.csv
+
+# Processed artefacts are regenerable from raw + scripts
+data/processed/*.parquet
+data/synthetic/*.parquet
+
+# Optuna study databases (regenerable)
+*.db
+*.sqlite3
+
+# Local Optuna logs
+optuna.log

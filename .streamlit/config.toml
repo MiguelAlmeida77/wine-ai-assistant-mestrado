@@ -1,0 +1,22 @@
+# Streamlit configuration tuned for Community Cloud deployment.
+# Local devs override via .streamlit/secrets.toml (never committed).
+
+[theme]
+base = "light"
+primaryColor = "#7a1f3a"
+backgroundColor = "#fefcf9"
+secondaryBackgroundColor = "#f4ece2"
+textColor = "#2c1810"
+font = "serif"
+
+[server]
+maxUploadSize = 50
+maxMessageSize = 100
+enableCORS = false
+enableXsrfProtection = true
+
+[browser]
+gatherUsageStats = false
+
+[runner]
+fastReruns = true

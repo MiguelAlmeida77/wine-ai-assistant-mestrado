@@ -1,0 +1,14 @@
+{
+  "best_value": 0.6645349376401725,
+  "best_params": {
+    "n_estimators": 700,
+    "max_depth": 7,
+    "learning_rate": 0.06031390114398127,
+    "subsample": 0.7926494748441422,
+    "colsample_bytree": 0.6062940462474563,
+    "reg_lambda": 0.9276933623008312
+  },
+  "n_trials": 12,
+  "model": "xgboost+tfidf",
+  "n_samples": 15000
+}

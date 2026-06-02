@@ -1,0 +1,30 @@
+{
+  "random_forest": {
+    "best_value": 0.39159738766867525,
+    "best_params": {
+      "n_estimators": 200,
+      "max_depth": 25,
+      "min_samples_split": 12,
+      "min_samples_leaf": 8,
+      "max_features": 0.5
+    },
+    "n_trials": 20,
+    "model": "random_forest"
+  },
+  "xgboost": {
+    "best_value": 0.39200596809387206,
+    "best_params": {
+      "n_estimators": 200,
+      "max_depth": 4,
+      "learning_rate": 0.022195109122206198,
+      "subsample": 0.7975990992289793,
+      "colsample_bytree": 0.7554709158757928,
+      "reg_lambda": 0.9339401285535338,
+      "reg_alpha": 0.5441108375656198,
+      "min_child_weight": 3
+    },
+    "n_trials": 20,
+    "model": "xgboost"
+  },
+  "winner": "xgboost"
+}
