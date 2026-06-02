@@ -1,8 +1,10 @@
 # Assistente Inteligente para Afinação, Estágio e Blend de Vinhos
 
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io)
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://wine-ai-assistant-mestrado-yoj4uyb8y2vstmcvxpcvpv.streamlit.app/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/)
+
+> **Demo público:** https://wine-ai-assistant-mestrado-yoj4uyb8y2vstmcvxpcvpv.streamlit.app/
 
 Protótipo desenvolvido no âmbito de dissertação de mestrado. Sistema de apoio
 à decisão para enólogos de adegas pequenas e médias, baseado em Inteligência
@@ -78,8 +80,10 @@ wine-ai-assistant/
 
 ## Deploy público (Streamlit Community Cloud)
 
-Este repositório está pronto para deploy gratuito em
-[share.streamlit.io](https://share.streamlit.io). Configuração:
+**Aplicação em produção:**
+[wine-ai-assistant-mestrado-yoj4uyb8y2vstmcvxpcvpv.streamlit.app](https://wine-ai-assistant-mestrado-yoj4uyb8y2vstmcvxpcvpv.streamlit.app/)
+
+Configuração de deploy:
 
 | Campo | Valor |
 |---|---|
