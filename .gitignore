@@ -12,9 +12,13 @@ __pycache__/
 # Wine Reviews CSV is 50 MB — downloaded at runtime by reviews_loader.py
 data/raw/winemag-reviews.csv
 
-# Processed artefacts are regenerable from raw + scripts
+# Processed artefacts are regenerable from raw + scripts.
+# Exceptions: the small UI-support files built by scripts/build_assets.py
+# (kept in repo so Streamlit Cloud does not need to download the 50 MB CSV).
 data/processed/*.parquet
 data/synthetic/*.parquet
+!data/processed/reviews_sample.parquet
+!data/processed/choices.json
 
 # Optuna study databases (regenerable)
 *.db

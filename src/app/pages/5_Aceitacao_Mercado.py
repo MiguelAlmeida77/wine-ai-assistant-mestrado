@@ -8,11 +8,13 @@ ROOT = Path(__file__).resolve().parents[3]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+import json
+
 import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-from src.data.reviews_loader import load_reviews
+from src.data.loader import PROCESSED_DIR
 from src.models.market_predictor import MarketModel, composite_score
 from src.models.quality_predictor import MODELS_DIR
 
@@ -32,18 +34,28 @@ def load_market_model() -> MarketModel:
 
 @st.cache_data
 def load_choices() -> dict:
+    path = PROCESSED_DIR / "choices.json"
+    if path.exists():
+        return json.loads(path.read_text(encoding="utf-8"))
+    # Fallback: build on the fly from full reviews CSV (slow first time)
+    from src.data.reviews_loader import load_reviews
     df = load_reviews()
     return {
         "countries": sorted(df["country"].dropna().unique().tolist()),
-        "varieties": (
-            df["variety"].value_counts().head(80).index.tolist()
-        ),
-        "provinces": (
-            df["province"].dropna().value_counts().head(120).index.tolist()
-        ),
+        "varieties": df["variety"].value_counts().head(80).index.tolist(),
+        "provinces": df["province"].dropna().value_counts().head(120).index.tolist(),
         "tasters": sorted(df["taster_name"].dropna().unique().tolist()),
         "price_median": float(df["price"].median()),
     }
+
+
+@st.cache_data
+def load_sample() -> pd.DataFrame:
+    path = PROCESSED_DIR / "reviews_sample.parquet"
+    if path.exists():
+        return pd.read_parquet(path)
+    from src.data.reviews_loader import load_reviews
+    return load_reviews().sample(n=8000, random_state=0)
 
 
 model = load_market_model()
@@ -131,7 +143,7 @@ if st.button("Prever pontuação de crítico", type="primary", use_container_wid
 
 st.divider()
 st.subheader("Distribuição do preço vs. pontos no dataset (orientação)")
-df_choice = load_reviews().sample(n=8000, random_state=0)
+df_choice = load_sample()
 fig = px.scatter(
     df_choice, x="price", y="points", color="country",
     opacity=0.4, log_x=True,

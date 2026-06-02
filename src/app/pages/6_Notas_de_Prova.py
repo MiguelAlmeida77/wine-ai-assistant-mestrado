@@ -8,11 +8,13 @@ ROOT = Path(__file__).resolve().parents[3]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+import json
+
 import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-from src.data.reviews_loader import load_reviews
+from src.data.loader import PROCESSED_DIR
 from src.models.quality_predictor import MODELS_DIR
 from src.models.tasting_notes import (
     DESCRIPTOR_FAMILIES,
@@ -36,6 +38,10 @@ def load_notes_model() -> NotesModel:
 
 @st.cache_data
 def choices() -> dict:
+    path = PROCESSED_DIR / "choices.json"
+    if path.exists():
+        return json.loads(path.read_text(encoding="utf-8"))
+    from src.data.reviews_loader import load_reviews
     df = load_reviews()
     return {
         "countries": sorted(df["country"].dropna().unique().tolist()),
