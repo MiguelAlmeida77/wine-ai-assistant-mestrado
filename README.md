@@ -1,5 +1,9 @@
 # Assistente Inteligente para Afinação, Estágio e Blend de Vinhos
 
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/)
+
 Protótipo desenvolvido no âmbito de dissertação de mestrado. Sistema de apoio
 à decisão para enólogos de adegas pequenas e médias, baseado em Inteligência
 Artificial. Cobre os quatro objetivos definidos na proposta de tese — e
@@ -71,6 +75,23 @@ wine-ai-assistant/
 ├── tests/                  # pytest suite
 └── requirements.txt
 ```
+
+## Deploy público (Streamlit Community Cloud)
+
+Este repositório está pronto para deploy gratuito em
+[share.streamlit.io](https://share.streamlit.io). Configuração:
+
+| Campo | Valor |
+|---|---|
+| Repository | `MiguelAlmeida77/wine-ai-assistant-mestrado` |
+| Branch | `main` |
+| Main file path | `src/app/app.py` |
+| Python version | `3.12` (lido de `runtime.txt`) |
+
+O primeiro build instala todas as dependências (≈ 5 min). Os modelos já estão
+no repositório (12 MB total comprimidos), e o dataset Wine Reviews tem assets
+leves pré-computados em `data/processed/` (305 KB), evitando o download do
+CSV de 50 MB no servidor.
 
 ## Instalação rápida (Windows)
 
