@@ -53,7 +53,6 @@ def main() -> None:
 
     _show("quality", MODELS_DIR / "quality_metrics.json")
     _show("intervalos (incerteza)", MODELS_DIR / "interval_metrics.json")
-    _show("envelhecimento", MODELS_DIR / "aging_metrics.json")
     _show("mercado", MODELS_DIR / "market_metrics.json")
     _show("Optuna — resumo", MODELS_DIR / "best_params_summary.json")
 

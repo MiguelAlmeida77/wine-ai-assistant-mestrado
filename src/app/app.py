@@ -17,7 +17,7 @@ st.set_page_config(
     layout="wide",
 )
 
-st.title("Assistente Inteligente para Afinação, Estágio e Blend de Vinhos")
+st.title("Assistente Inteligente para Afinação e Blend de Vinhos")
 st.caption(
     "Protótipo desenvolvido no âmbito da dissertação de mestrado — apoio à decisão "
     "para enólogos de adegas pequenas e médias."
@@ -30,15 +30,18 @@ with col1:
         """
         ### Objetivo
         Disponibilizar a enólogos uma ferramenta baseada em Inteligência Artificial
-        para apoiar três decisões críticas:
+        para apoiar decisões técnicas críticas:
 
         1. **Predição de qualidade** — estimar a pontuação sensorial provável a partir
-           do perfil físico-químico de um vinho.
+           do perfil físico-químico de um vinho, com intervalo de incerteza e
+           explicações.
         2. **Recomendação de blends** — otimizar as proporções de vinhos-base
            disponíveis para maximizar qualidade prevista, respeitando restrições
            técnicas e regulamentares.
-        3. **Estágio / envelhecimento** — prever a evolução da química e da
-           qualidade ao longo do tempo de guarda em garrafa.
+        3. **Aceitação de mercado** — estimar a pontuação esperada de crítica a
+           partir de metadados e descritores do vinho.
+        4. **Notas de prova** — gerar automaticamente descritores aromáticos e
+           sensoriais característicos do vinho.
 
         Use o menu lateral para aceder a cada módulo.
         """
@@ -62,8 +65,6 @@ st.markdown(
     """
     - As pontuações de qualidade são previsões probabilísticas, não substituem o
       painel de provadores. Devem ser usadas como ranking entre alternativas.
-    - As trajetórias de estágio assumem condições de conservação adequadas
-      (cortiça em bom estado, temperatura 14–16 °C, humidade controlada).
     - A mistura química do blend assume linearidade em volume — válido para
       álcool, açúcar e SO₂; aproximado para pH e densidade.
     """

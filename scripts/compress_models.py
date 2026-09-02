@@ -15,7 +15,6 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 # Touch imports so unpickle finds the classes
-from src.models.aging_predictor import AgingModel  # noqa: F401
 from src.models.market_predictor import MarketModel  # noqa: F401
 from src.models.quality_predictor import MODELS_DIR, QualityModel  # noqa: F401
 from src.models.tasting_notes import NotesModel  # noqa: F401

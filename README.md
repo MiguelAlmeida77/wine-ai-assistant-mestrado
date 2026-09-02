@@ -1,4 +1,4 @@
-# Assistente Inteligente para Afinação, Estágio e Blend de Vinhos
+# Assistente Inteligente para Afinação e Blend de Vinhos
 
 [![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://wine-ai-assistant-mestrado-yoj4uyb8y2vstmcvxpcvpv.streamlit.app/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -8,35 +8,25 @@
 
 Protótipo desenvolvido no âmbito de dissertação de mestrado. Sistema de apoio
 à decisão para enólogos de adegas pequenas e médias, baseado em Inteligência
-Artificial. Cobre os quatro objetivos definidos na proposta de tese — e
-adiciona aceitação de mercado, quantificação de incerteza e *tuning*
-sistemático:
+Artificial. Quatro módulos funcionais, complementados por quantificação de
+incerteza, explicabilidade e *tuning* sistemático:
 
-1. **Modelo preditivo** — química → pontuação sensorial (XGB / RF, comparados
-   por *ablation* estratificado).
-2. **Recomendador de blends** — otimização restrita (SLSQP multi-start) sobre
-   o modelo de qualidade, com restrições enológicas (álcool, acidez volátil,
-   SO₂, perfil-alvo).
-3. **Previsão de envelhecimento** — trajetórias químicas analíticas calibradas
-   pela literatura + GradientBoosting para a curva de qualidade.
-4. **Interface interativa** — aplicação Streamlit multi-página em português.
-5. **Aceitação de mercado** — XGBoost + TF-IDF treinado em 120k *reviews*
+1. **Predição de qualidade** — química → pontuação sensorial (XGB / RF,
+   comparados por *ablation* estratificado), com intervalos de incerteza
+   (quantis XGB + *split-conformal*) e explicações (SHAP + contrafactuais).
+2. **Recomendação de blends** — otimização restrita (SLSQP multi-start) e
+   otimização bayesiana (Optuna TPE), com restrições enológicas (álcool,
+   acidez volátil, SO₂, perfil-alvo) e fronteira de Pareto (NSGA-II).
+3. **Aceitação de mercado** — XGBoost + TF-IDF treinado em 120k *reviews*
    Wine Enthusiast; *Group K-Fold* por *winery* (sem leakage entre produtores).
-6. **Quantificação de incerteza** — quantis XGB + *split-conformal*; intervalos
-   80% com cobertura empírica reportada.
-7. **Tuning** — Optuna (TPE) para todos os modelos, *best_params* persistidos.
-8. **Contrafactuais** — dado um vinho com qualidade prevista X, devolve a
-   *menor* alteração química que atinge um alvo Y, dentro dos limites do
-   *dataset* (SLSQP multi-start com fast-path numpy).
-9. **Otimização bayesiana de blends** — Optuna TPE como alternativa global ao
-   SLSQP; NSGA-II multi-objetivo gera *Pareto front* qualidade × álcool-alvo.
-10. **Augmentação varietal sintética** — perturbações por casta (Touriga,
-    Alvarinho, Loureiro, Vinhão, etc.) calibradas pela literatura enológica.
-    Comparação com/sem augmentação reportada (GroupKFold para evitar leakage:
-    sem ganho real de generalização — resultado academicamente honesto).
-11. **Geração de notas de prova** — léxico de 40 descritores extraídos do
-    Wine Reviews; multi-output logístico (variedade/país/preço → probabilidade
-    por descritor); renderização em PT por templates.
+4. **Geração de notas de prova** — léxico de 40 descritores extraídos do
+   Wine Reviews; multi-output logístico (variedade/país/preço → probabilidade
+   por descritor); renderização em PT por *templates*.
+
+Interface **Streamlit multi-página em português**. Optimização de
+hiperparâmetros com Optuna (TPE) para todos os modelos. Inclui ainda um estudo
+de **augmentação varietal sintética** cuja avaliação por GroupKFold demonstra a
+ausência de ganho real de generalização (resultado academicamente honesto).
 
 ## Stack
 
@@ -50,21 +40,21 @@ sistemático:
 wine-ai-assistant/
 ├── data/
 │   ├── raw/               # CSVs UCI Wine Quality + Wine Reviews
-│   ├── processed/         # parquet limpo
-│   └── synthetic/         # trajetórias de envelhecimento
+│   └── processed/         # parquet limpo + assets leves da UI
 ├── models/                # modelos persistidos (joblib) + métricas (json) + relatórios
 ├── src/
 │   ├── data/
 │   │   ├── loader.py            # UCI Wine Quality
 │   │   ├── preprocessor.py
-│   │   ├── synthetic_aging.py   # equações de cinética enológica
 │   │   └── reviews_loader.py    # Wine Reviews (Wine Enthusiast)
 │   ├── models/
 │   │   ├── quality_predictor.py # XGB/RF por tipo, comparados
-│   │   ├── blend_recommender.py # SLSQP multi-start com restrições
-│   │   ├── aging_predictor.py   # GBM em trajetórias sintéticas
 │   │   ├── uncertainty.py       # quantile XGB + split-conformal
+│   │   ├── blend_recommender.py # SLSQP multi-start com restrições
+│   │   ├── blend_bo.py          # otimização bayesiana + Pareto
+│   │   ├── counterfactual.py    # explicações contrafactuais
 │   │   ├── market_predictor.py  # XGB + TF-IDF
+│   │   ├── tasting_notes.py     # geração de notas de prova
 │   │   └── evaluation.py        # CV estratificada/agrupada + ablation
 │   ├── utils/             # ranges para sliders
 │   └── app/               # Streamlit multi-página
@@ -141,8 +131,8 @@ apresenta handshake TLS inconsistente em algumas configurações Windows).
 **Aceitação de mercado — GroupKFold por winery (Wine Reviews, 120k linhas)**
 - R² 0.68 ± 0.01 • RMSE 1.71 ± 0.01 pontos (escala 80–100)
 
-**Envelhecimento (trajetórias sintéticas + GradientBoosting)**
-- R² 0.41 • RMSE 0.79 (em curvas sintéticas calibradas pela literatura)
+**Notas de prova — multi-etiqueta, GroupKFold por winery**
+- F1 micro 0.25 • F1 macro 0.10 (34 descritores)
 
 Detalhes em `models/evaluation_report.md`.
 
@@ -150,13 +140,13 @@ Detalhes em `models/evaluation_report.md`.
 
 - Cobertura regional limitada (Vinho Verde) — generalização exige re-treino.
 - A qualidade é proxy: média de provadores, não painel sensorial dedicado.
-- Trajetórias de estágio são sintéticas; validação industrial requer dataset
-  longitudinal real.
+- Pontuações de crítica (Wine Reviews) de uma única publicação e escala
+  censurada à esquerda (≥ 80 pontos) — enviesamento de seleção.
 - Mistura química do blend assume linearidade em volume (exata para álcool,
   açúcar e SO₂; aproximada para pH e densidade).
 
 ## Próximos passos (para fora deste ciclo)
 
 - Dados sensoriais reais de adega parceira.
-- Descritores aromáticos (Kaggle Wine Reviews) num modelo multimodal.
-- Validação longitudinal do modelo de envelhecimento.
+- Modelo multimodal combinando química, texto e cor.
+- Auditoria de viés por região, casta e escalão de preço.

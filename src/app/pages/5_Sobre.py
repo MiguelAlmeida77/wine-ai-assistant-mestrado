@@ -25,11 +25,12 @@ st.title("Sobre a Dissertação")
 st.markdown(
     """
     ## Tema
-    *Assistente Inteligente para Afinação, Estágio e Blend de Vinhos.*
+    *Assistente Inteligente para Afinação e Blend de Vinhos.*
 
     Este protótipo demonstra a viabilidade de utilizar Inteligência Artificial
     para apoiar enólogos de adegas pequenas e médias em decisões técnicas
-    críticas — predição de qualidade, otimização de blends e gestão do estágio.
+    críticas — predição de qualidade, otimização de blends, estimativa da
+    aceitação de mercado e geração de notas de prova.
 
     ## Arquitetura
     """
@@ -41,11 +42,14 @@ src/
 ├── data/
 │   ├── loader.py            # download e leitura UCI Wine Quality
 │   ├── preprocessor.py      # limpeza + features derivadas
-│   └── synthetic_aging.py   # equações de envelhecimento (literatura)
+│   └── reviews_loader.py    # Wine Reviews (Wine Enthusiast)
 ├── models/
 │   ├── quality_predictor.py # XGBoost / RandomForest por tipo de vinho
+│   ├── uncertainty.py       # intervalos (quantile + conformal)
 │   ├── blend_recommender.py # otimização SLSQP (scipy)
-│   └── aging_predictor.py   # GradientBoosting nas trajetórias sintéticas
+│   ├── blend_bo.py          # otimização bayesiana + Pareto (Optuna)
+│   ├── market_predictor.py  # aceitação de mercado (XGBoost + TF-IDF)
+│   └── tasting_notes.py     # geração de notas de prova
 ├── utils/
 │   └── ranges.py            # ranges físicos para sliders
 └── app/
@@ -61,9 +65,9 @@ st.markdown(
     - **UCI Wine Quality** (Cortez et al., 2009) — 1 599 tintos + 4 898 brancos
       da região do Vinho Verde, 11 variáveis físico-químicas e nota sensorial
       média 0–10 de três provadores.
-    - **Trajetórias sintéticas de envelhecimento** geradas a partir de equações
-      de cinética química com parâmetros calibrados pela literatura
-      (Ribéreau-Gayon, Boulton, OIV).
+    - **Wine Reviews** (Wine Enthusiast, ~120 mil críticas) — país, casta,
+      preço, provador e descritor textual, com pontuação 80–100 do crítico.
+      Suporta os módulos de aceitação de mercado e notas de prova.
 
     ## Modelos e métricas
     """
@@ -71,7 +75,6 @@ st.markdown(
 
 # Load metrics if available
 qmetrics_path = MODELS_DIR / "quality_metrics.json"
-ametrics_path = MODELS_DIR / "aging_metrics.json"
 
 if qmetrics_path.exists():
     qmetrics = json.loads(qmetrics_path.read_text(encoding="utf-8"))
@@ -91,25 +94,6 @@ if qmetrics_path.exists():
         )
     st.markdown("### Predição de qualidade")
     st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
-
-if ametrics_path.exists():
-    ametrics = json.loads(ametrics_path.read_text(encoding="utf-8"))
-    st.markdown("### Modelo de envelhecimento")
-    st.dataframe(
-        pd.DataFrame(
-            [
-                {
-                    "R² (teste)": round(ametrics["r2"], 3),
-                    "RMSE": round(ametrics["rmse"], 3),
-                    "MAE": round(ametrics["mae"], 3),
-                    "N treino": ametrics["n_train"],
-                    "N teste": ametrics["n_test"],
-                }
-            ]
-        ),
-        use_container_width=True,
-        hide_index=True,
-    )
 
 st.markdown(
     """
@@ -204,17 +188,15 @@ st.markdown(
       generalização para outras regiões/castas exige re-treino.
     - A qualidade UCI é a média de três provadores numa escala 0–10; é uma
       proxy razoável mas não substitui um painel sensorial dedicado.
-    - O modelo de envelhecimento usa trajetórias sintéticas calibradas pela
-      literatura. Para validação industrial seria necessário um *dataset*
-      longitudinal de amostras provadas em vários anos.
+    - As pontuações de crítica (Wine Reviews) provêm de uma única publicação e
+      a escala é censurada à esquerda (não são publicados vinhos abaixo de 80),
+      introduzindo enviesamento de seleção.
     - O modelo de blend assume mistura linear por fração volumétrica — exato
       para álcool, açúcar e SO₂; aproximado para pH e densidade.
 
     ## Próximos passos
     1. Integrar dados de provas sensoriais reais de uma adega parceira.
-    2. Incorporar descritores aromáticos textuais (e.g. *Wine Reviews* do Kaggle)
-       num modelo multimodal.
-    3. Validar o modelo de envelhecimento com vinhos guardados em garrafa por
-       períodos conhecidos.
+    2. Combinar química, texto e cor num modelo multimodal.
+    3. Auditar o desempenho por região, casta e escalão de preço.
     """
 )

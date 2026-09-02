@@ -8,7 +8,6 @@ import pytest
 
 from src.data.loader import FEATURE_COLUMNS, load_raw
 from src.data.preprocessor import add_engineered_features, basic_clean
-from src.data.synthetic_aging import peak_year, project_chemistry, quality_curve
 from src.models.blend_recommender import (
     BaseWine,
     BlendConstraints,
@@ -64,39 +63,6 @@ def test_mix_chemistry_linear() -> None:
     b = BaseWine("b", chem_b)
     mixed = mix_chemistry([a, b], np.array([0.5, 0.5]))
     assert mixed["alcohol"] == pytest.approx(13.5)
-
-
-def test_project_chemistry_monotonic_so2() -> None:
-    """Free SO2 must decrease monotonically with time."""
-    chem = _sample_chem()
-    so2 = [project_chemistry(chem, t, "red")["free sulfur dioxide"]
-           for t in (0, 2, 5, 10)]
-    assert all(so2[i] > so2[i + 1] for i in range(len(so2) - 1))
-
-
-def test_project_chemistry_va_increases() -> None:
-    """Volatile acidity must rise (or stay flat at cap) over time."""
-    chem = _sample_chem()
-    va = [project_chemistry(chem, t, "red")["volatile acidity"]
-          for t in (0, 2, 5, 10)]
-    assert all(va[i] <= va[i + 1] for i in range(len(va) - 1))
-
-
-def test_peak_year_within_bounds() -> None:
-    for wt in ("red", "white"):
-        p = peak_year(_sample_chem(), wt)
-        assert 1.0 <= p <= 20.0
-
-
-def test_quality_curve_inverted_u() -> None:
-    """The curve should have a single global maximum (inverted U)."""
-    chem = _sample_chem()
-    curve = quality_curve(chem, 6.0, "red", years_grid=np.arange(0, 15, 0.5))
-    q = curve["predicted_quality"].values
-    peak_idx = int(np.argmax(q))
-    # Strictly non-decreasing before peak and non-increasing after (allow ties)
-    assert all(q[i] <= q[i + 1] + 1e-9 for i in range(peak_idx))
-    assert all(q[i] >= q[i + 1] - 1e-9 for i in range(peak_idx, len(q) - 1))
 
 
 @pytest.mark.skipif(

@@ -15,7 +15,6 @@ if str(ROOT) not in sys.path:
 
 from src.data.loader import load_raw, save_processed
 from src.data.reviews_loader import load_reviews, save_processed_reviews
-from src.models.aging_predictor import train as train_aging
 from src.models.market_predictor import train as train_market
 from src.models.quality_predictor import MODELS_DIR, train_all as train_quality
 from src.models.tasting_notes import train as train_notes
@@ -48,17 +47,13 @@ def main() -> None:
         json.dumps(iv_summary, indent=2), encoding="utf-8"
     )
 
-    print("[4/5] A treinar modelo de envelhecimento (trajetórias sintéticas)...")
-    aging = train_aging()
-    print(f"      R²={aging.metrics['r2']:.3f}")
-
-    print("[5/6] A treinar modelo de mercado (Wine Reviews)...")
+    print("[4/5] A treinar modelo de mercado (Wine Reviews)...")
     df_rev = load_reviews()
     save_processed_reviews(df_rev)
     mkt = train_market()
     print(f"      R²={mkt.metrics['r2']:.3f} • RMSE={mkt.metrics['rmse']:.2f}")
 
-    print("[6/6] A treinar gerador de notas de prova...")
+    print("[5/5] A treinar gerador de notas de prova...")
     notes = train_notes()
     print(f"      F1 micro={notes.metrics['f1_micro']:.3f} • {notes.metrics['n_descriptors']} descritores")
 
