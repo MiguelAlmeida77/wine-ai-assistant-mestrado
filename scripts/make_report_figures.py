@@ -231,12 +231,16 @@ def fig_augmentation() -> Path:
 def fig_descritores() -> Path:
     meta = json.loads((MODELS_DIR / "notes_metrics.json").read_text(encoding="utf-8"))
     freq = meta["frequencies"]
-    s = pd.Series(freq).sort_values(ascending=True).tail(18)
-    fig, ax = plt.subplots(figsize=(7.5, 6))
-    ax.barh(range(len(s)), s.values * 100, color=WINE_RED)
-    ax.set_yticks(range(len(s)), s.index, fontsize=9)
+    # Mostrar TODOS os descritores retidos (frequência >= 1%), ordenados
+    s = pd.Series(freq).sort_values(ascending=True)
+    fig, ax = plt.subplots(figsize=(7.5, 9))
+    bars = ax.barh(range(len(s)), s.values * 100, color=WINE_RED)
+    ax.bar_label(bars, labels=[f"{v*100:.1f}" for v in s.values],
+                 padding=2, fontsize=7)
+    ax.set_yticks(range(len(s)), s.index, fontsize=8)
     ax.set_xlabel("Frequência nas críticas (%)")
-    ax.set_title("Descritores mais frequentes (Wine Reviews)")
+    ax.set_title(f"Frequência dos {len(s)} descritores extraídos (Wine Reviews)")
+    ax.margins(x=0.10)
     return _save(fig, "fig_descritores.png")
 
 
