@@ -79,8 +79,7 @@ mode = st.radio(
 )
 
 if mode == "Exemplos do dataset":
-    seed = st.number_input("Seed para reamostragem", 0, 10_000, 7, step=1)
-    base_wines = sample_base_wines_from_dataset(df_raw, wine_type, n=n_bases, seed=int(seed))
+    base_wines = sample_base_wines_from_dataset(df_raw, wine_type, n=n_bases, seed=7)
 else:
     ranges = feature_ranges(wine_type)
     base_wines = []
@@ -122,26 +121,8 @@ with c3:
 with c4:
     max_so2 = st.number_input("SO₂ total máximo (mg/L)", 50.0, 350.0, 200.0, 5.0)
 
-target_style = st.checkbox("Alvejar perfil-estilo específico (avançado)")
 target_profile = None
 target_weight = 0.0
-if target_style:
-    target_weight = st.slider("Peso do alvo vs qualidade", 0.0, 2.0, 0.5, 0.1)
-    ranges = feature_ranges(wine_type)
-    cols = st.columns(3)
-    target_profile = {}
-    features_split = np.array_split(FEATURE_COLUMNS, 3)
-    for col, group in zip(cols, features_split):
-        with col:
-            for f in group:
-                lo, hi, med = ranges[f]
-                target_profile[f] = st.number_input(
-                    f"Alvo: {FEATURE_LABELS_PT[f]}",
-                    value=float(round(med, 3)),
-                    min_value=float(round(lo, 3)),
-                    max_value=float(round(hi, 3)),
-                    key=f"target_{f}",
-                )
 
 constraints = BlendConstraints(
     min_alcohol=min_alc,
@@ -162,9 +143,7 @@ optimizer = st.radio(
         "BO/TPE explora melhor a superfície mas demora alguns segundos."
     ),
 )
-n_trials_bo = 80
-if optimizer.startswith("Bayesian"):
-    n_trials_bo = st.slider("Trials BO", 30, 250, 100, 10)
+n_trials_bo = 100
 
 # --- Optimize ---
 if st.button("Calcular blend ótimo", type="primary", use_container_width=True):
@@ -226,11 +205,8 @@ st.caption(
     "álcool de um valor-alvo), o Pareto front mostra as combinações onde não é "
     "possível melhorar um objetivo sem piorar o outro. NSGA-II via Optuna."
 )
-pareto_c1, pareto_c2 = st.columns(2)
-with pareto_c1:
-    target_alc = st.number_input("Álcool-alvo (% vol.)", 9.0, 16.0, 12.5, 0.1)
-with pareto_c2:
-    n_trials_pareto = st.slider("Trials Pareto", 60, 300, 150, 10)
+target_alc = st.number_input("Álcool-alvo (% vol.)", 9.0, 16.0, 12.5, 0.1)
+n_trials_pareto = 150
 
 if st.button("Gerar Pareto front"):
     with st.spinner("A explorar..."):
@@ -241,7 +217,7 @@ if st.button("Gerar Pareto front"):
             n_trials=n_trials_pareto,
         )
     if pf.empty:
-        st.warning("Nenhum ponto Pareto encontrado — tente mais trials.")
+        st.warning("Nenhum ponto Pareto encontrado — tente outro álcool-alvo.")
     else:
         st.markdown(f"**{len(pf)} soluções na fronteira de Pareto**")
         fig = px.scatter(
